@@ -20,6 +20,6 @@ cmake --install deps/kinet-gpu/build --config Release
 ```bash
 cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
 
-run: cmake --build build --config Release
+cmake --build build --config Release
 
 ```
