@@ -1,4 +1,5 @@
 # accel
+
 Kinet GPU-accelerated cryptography library (NTT, TFHE, BLS, ML-KEM, MSM)
 
 # Building
@@ -6,6 +7,7 @@ Kinet GPU-accelerated cryptography library (NTT, TFHE, BLS, ML-KEM, MSM)
 ## kinet-gpu
 
 ```bash
+
 cmake -B deps/kinet-gpu/build -S deps/kinet-gpu -G Ninja -DCMAKE_BUILD_TYPE=Release
 
 cmake --build deps/kinet-gpu/build --config Release
@@ -18,6 +20,7 @@ cmake --install deps/kinet-gpu/build --config Release
 ## accel
 
 ```bash
+
 cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
 
 cmake --build build --config Release

@@ -1,10 +1,11 @@
 cmake_minimum_required(VERSION 3.20)
-project(kinet-accel VERSION 0.1.1 LANGUAGES CXX)
+project(kinet-accel VERSION 0.1.2 LANGUAGES CXX)
 
-# kinet-accel is THE shared library for Go/FFI consumers
-# It statically links kinet-gpu core and exports only C ABI
+# kinet-accel is THE shared library for Go/FFI consumers.
+# It statically links kinet-gpu-rt (C++23 abstract GPU runtime, formerly
+# `kinet-gpu`) and exports only C ABI.
 
-find_package(kinet-gpu CONFIG REQUIRED)
+find_package(kinet-gpu-rt CONFIG REQUIRED)
 
 # Build as SHARED library
 add_library(kinetaccel SHARED
@@ -32,10 +33,10 @@ target_include_directories(kinetaccel
     $<INSTALL_INTERFACE:include>
 )
 
-# Link gpu core PRIVATELY (statically embedded)
-# The static library symbols are absorbed into kinetaccel.so
+# Link gpu runtime PRIVATELY (statically embedded).
+# The static library symbols are absorbed into kinetaccel.so.
 target_link_libraries(kinetaccel
-  PRIVATE kinet::kinet_gpu_core
+  PRIVATE kinet::gpu-rt
 )
 
 # Platform libraries for dlopen (backend plugin loading)
