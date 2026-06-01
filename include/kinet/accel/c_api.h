@@ -239,6 +239,39 @@ KINET_API kinet_status kinet_dilithium_verify(kinet_session session, kinet_tenso
                                          kinet_tensor sig, kinet_tensor pk, int* valid);
 
 // =============================================================================
+// SLH-DSA / Comet (FIPS 205) operations
+// =============================================================================
+//
+// SLH-DSA is a stateless hash-based signature scheme (FIPS 205, formerly
+// SPHINCS+). The Comet protocol slot (`0x012207`) lifts SLH-DSA into Kinet's
+// PQ-GPU dispatch path: per-validator verify batched across the cert quorum.
+//
+// Mode encoding mirrors the kinetcpp/crypto/slhdsa C ABI:
+//   2  -> SLH-DSA-SHA2-128f  (NIST L1)
+//   3  -> SLH-DSA-SHA2-192f  (NIST L3)   <-- canonical for Comet cert profile
+//   5  -> SLH-DSA-SHA2-256f  (NIST L5)
+//   12 -> SLH-DSA-SHAKE-128f (NIST L1)
+//   13 -> SLH-DSA-SHAKE-192f (NIST L3)
+//   15 -> SLH-DSA-SHAKE-256f (NIST L5)
+//
+// Tensor shapes (n = batch size):
+//   msgs    : KINET_DTYPE_U8, shape [n, msg_width]
+//   sigs    : KINET_DTYPE_U8, shape [n, sig_bytes]   (sig_bytes per mode)
+//   pks     : KINET_DTYPE_U8, shape [n, pk_bytes]    (pk_bytes per mode)
+//   results : KINET_DTYPE_U8, shape [n]              (1 = valid, 0 = invalid)
+//
+// Batch verify dispatches the FIPS 205 verify per element. Result vector is
+// dense (no early abort) so consumers can audit per-signer failures. Sign
+// batch is provided symmetrically; deterministic per FIPS 205 (no nonces).
+
+KINET_API kinet_status kinet_slhdsa_sign_batch(kinet_session session, int mode,
+                                          kinet_tensor msgs, kinet_tensor sks,
+                                          kinet_tensor sigs);
+KINET_API kinet_status kinet_slhdsa_verify_batch(kinet_session session, int mode,
+                                            kinet_tensor msgs, kinet_tensor sigs,
+                                            kinet_tensor pks, kinet_tensor results);
+
+// =============================================================================
 // FHE operations
 // =============================================================================
 

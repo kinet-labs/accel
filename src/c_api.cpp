@@ -629,6 +629,38 @@ KINET_API kinet_status kinet_dilithium_verify(kinet_session session, kinet_tenso
     return KINET_NOT_SUPPORTED;
 }
 
+// =============================================================================
+// SLH-DSA / Comet (FIPS 205) — batch sign / batch verify
+// =============================================================================
+//
+// Same dispatch pattern as kinet_dilithium_*: the C ABI is the wire that Go's
+// accel.LatticeOps.SLHDSAVerifyBatch crosses. A real implementation links the
+// per-mode SLH-DSA verifier (PQClean reference, the kinetcpp/crypto/slhdsa
+// kernel substrate, or — when present — a Metal/CUDA plugin that registers a
+// strong override of these symbols).
+//
+// Until a plugin overrides, the weak stub returns KINET_NOT_SUPPORTED so the
+// Go-side dispatcher falls through to its CPU backend (cloudflare/circl). The
+// fall-through is byte-equivalent to a CPU verify by construction — same
+// FIPS 205 spec, same NIST KATs pass on both sides — which is what the
+// equivalence test in `crypto/slhdsa` asserts.
+
+KINET_API kinet_status kinet_slhdsa_sign_batch(kinet_session session, int mode,
+                                          kinet_tensor msgs, kinet_tensor sks,
+                                          kinet_tensor sigs) {
+    (void)session; (void)mode; (void)msgs; (void)sks; (void)sigs;
+    set_error("slhdsa_sign_batch not yet implemented");
+    return KINET_NOT_SUPPORTED;
+}
+
+KINET_API kinet_status kinet_slhdsa_verify_batch(kinet_session session, int mode,
+                                            kinet_tensor msgs, kinet_tensor sigs,
+                                            kinet_tensor pks, kinet_tensor results) {
+    (void)session; (void)mode; (void)msgs; (void)sigs; (void)pks; (void)results;
+    set_error("slhdsa_verify_batch not yet implemented");
+    return KINET_NOT_SUPPORTED;
+}
+
 KINET_API kinet_status kinet_bfv_encrypt(kinet_session session, kinet_tensor plaintext,
                                     kinet_tensor pk, kinet_tensor ciphertext) {
     (void)session; (void)plaintext; (void)pk; (void)ciphertext;

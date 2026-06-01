@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(kinet-accel VERSION 0.1.0 LANGUAGES CXX)
+project(kinet-accel VERSION 0.1.1 LANGUAGES CXX)
 
 # kinet-accel is THE shared library for Go/FFI consumers
 # It statically links kinet-gpu core and exports only C ABI
@@ -101,3 +101,27 @@ install(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/kinet-accelConfigVersion.cmake
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/kinet-accel
 )
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Tests (-DKINET_ACCEL_TESTING=ON)
+# ─────────────────────────────────────────────────────────────────────────────
+option(KINET_ACCEL_TESTING "Build kinet-accel unit tests" OFF)
+if(KINET_ACCEL_TESTING)
+  include(FetchContent)
+  FetchContent_Declare(
+    googletest
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG        v1.14.0
+  )
+  set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+  FetchContent_MakeAvailable(googletest)
+
+  enable_testing()
+
+  add_executable(kinet_accel_buffer_test test/buffer_test.cpp)
+  target_compile_features(kinet_accel_buffer_test PRIVATE cxx_std_17)
+  target_link_libraries(kinet_accel_buffer_test
+    PRIVATE kinetaccel GTest::gtest GTest::gtest_main
+  )
+  add_test(NAME kinet_accel_buffer_test COMMAND kinet_accel_buffer_test)
+endif()
