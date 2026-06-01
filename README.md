@@ -10,8 +10,10 @@ cmake -B deps/kinet-gpu/build -S deps/kinet-gpu -G Ninja -DCMAKE_BUILD_TYPE=Rele
 
 cmake --build deps/kinet-gpu/build --config Release
 
+cmake --install deps/kinet-gpu/build --config Release
 
 ```
+
 
 ## accel
 
